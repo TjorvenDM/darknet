@@ -60,6 +60,7 @@ def log_parser(args):
 
     iterations = []
     losses = []
+
     fig, ax = plt.subplots()
     # set area we focus on
     ax.set_ylim(0, 8)
@@ -69,6 +70,18 @@ def log_parser(args):
     ax.yaxis.set_major_locator(major_locator)
     ax.yaxis.set_minor_locator(minor_locator)
     ax.yaxis.grid(True, which='minor')
+
+    # Extract mAP values from the log file
+    accuracy_pattern = re.compile(r"Last accuracy mAP@0\.50 = (\d+\.\d+) %")
+    accuracy_matches = accuracy_pattern.findall(log_content)
+    accuracy_array = []
+    if accuracy_matches:
+        print(len(accuracy_matches))
+        for match in accuracy_matches:
+          accuracy_array.append(match)
+        accuracy = float(accuracy_matches[-1])
+        print(accuracy_array)
+        print("Accuracy: {}%".format(accuracy))
 
     pattern = re.compile(r"([\d].*): .*?, (.*?) avg")
     # print(pattern.findall(log_content))
@@ -88,13 +101,20 @@ def log_parser(args):
         counter += 1
         if log_count > 200:
             if counter % 200 == 0:
-                print('parsing {}/{}'.format(counter, log_count))
+                print('parsing {}/{}/{}'.format(counter, log_count, counter))
         else:
-            print('parsing {}/{}'.format(counter, log_count))
+            print('parsing {}/{}/{}'.format(counter, log_count, counter))
         iteration, loss = match
         iterations.append(int(iteration))
         losses.append(float(loss))
-        out_file.write(iteration + ',' + loss + '\n')
+
+        print(counter)
+        # mAP starts from 1000 iterations
+        if counter > 1000 and counter < 1000 + len(accuracy_array):
+            mean_avg_precision = accuracy_array[counter-1000]
+            out_file.write(iteration + ',' + loss + ',' + mean_avg_precision + '\n')
+        else:
+            out_file.write(iteration + ',' + loss + ','+ '0' + '\n')
 
     ax.plot(iterations, losses)
     plt.xlabel('Iteration')
