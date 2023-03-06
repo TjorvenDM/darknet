@@ -395,7 +395,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         //    (iteration >= (iter_save + 1000) || iteration % 1000 == 0) && net.max_batches < 10000)
         if (((iteration >= (iter_save + 1000) || iteration % 1000 == 0) || 
              (iteration >= (iter_save + 100) && iteration <= 2000 && iteration % 100 == 0)) ||
-             (iteration >= (iter_save + 1000) && iteration > 2000 && iteration % 1000 == 0))
+             (iteration >= (iter_save + 500) && iteration > 2000 && iteration % 500 == 0))
         {
             iter_save = iteration;
 #ifdef GPU
